@@ -118,14 +118,14 @@ io.sockets.on('connection', function (socket) {
     var x = msg[0];
     var y = msg[1];
 
-    data.turn = (data.turn+1)%data.players.length;
-    data.state[x][y] = data.turn;
+    data.state[x][y] = data.turn + 1;
 
     if (x === undefined || y === undefined){
         return;
     }
 
     io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
+    data.turn = (data.turn+1)%data.players.length;
     io.sockets.emit('data',data);
   });
 
