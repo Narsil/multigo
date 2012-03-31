@@ -25,6 +25,11 @@
             }],
         'turn': 0
     };
+    var player = 0;
+
+    s.onmessage = function(msg){
+        data = $.parseJSON(msg);
+    };
 
     var put_stone = function(x, y){
         s.send(JSON.stringify([x, y]));
@@ -42,16 +47,18 @@
             case -1:
                 break;
             case 0:
-                color = data.players[data.turn].color;
-                stone.hover(function(){
-                    stone.attr('opacity', 0.5);
-                }, function(){
+                if(data.turn == player){
+                    color = data.players[data.turn].color;
+                    stone.hover(function(){
+                        stone.attr('opacity', 0.5);
+                    }, function(){
+                        stone.attr('opacity', 0);
+                    });
+                    stone.click(function(){
+                        put_stone(x, y);
+                    });
                     stone.attr('opacity', 0);
-                });
-                stone.click(function(){
-                    put_stone(x, y);
-                });
-                stone.attr('opacity', 0);
+                }
                 break;
             default:
                 color = data.players[value - 1].color;
@@ -93,12 +100,4 @@
         draw();
     });
     draw();
-    draw_stone(0, 0, 1);
-    draw_stone(1, 1, 1);
-
-    draw_stone(0, 1, 2);
-    draw_stone(6, 2, 2);
-
-    draw_stone(5, 6, 3);
-    draw_stone(7, 5, 3);
 })();
