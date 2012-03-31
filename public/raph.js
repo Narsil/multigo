@@ -39,9 +39,17 @@
         draw();
     });
 
+    socket.on('poll',function(msg){
+        
+    });
+
     var put_stone = function(x, y){
         socket.emit('play', [x, y]);
     };
+
+    var pass = function(){
+        socket.emit('play',null);
+    }
 
     var draw_stone = function(x, y, value){
         var real_x = (x + 1) * square_length;
