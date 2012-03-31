@@ -124,7 +124,7 @@ io.sockets.on('connection', function (socket) {
         return;
     }
 
-    console.log(data.players[data.turn] + 'a joué en ' + x +', ' + y);
+    socket.broadcast.emit('announcement', data.players[data.turn] + 'a joué en ' + x +', ' + y);
     socket.broadcast.emit('data',data);
   });
 
