@@ -90,24 +90,24 @@ io.sockets.on('connection', function (socket) {
             'name': nick,
             'color': '#000'
           });
-          io.sockets.emit('position', 0);
+          socket.emit('position', 0);
         break;
       case 1:
         data.players.push({
             'name': nick,
             'color': '#fff'
           });
-        io.sockets.emit('position', 1);
+        socket.emit('position', 1);
         break;
       case 2:
         data.players.push({
             'name': nick,
             'color': '#f00'
           });
-        io.sockets.emit('position', 2);
+        socket.emit('position', 2);
         break;
       default:
-        io.sockets.emit('position', -1);
+        socket.emit('position', -1);
         break;
     }
     }
