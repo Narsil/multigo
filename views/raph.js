@@ -1,13 +1,36 @@
 (function(){
     var paper;
     var square_length;
-    var colors = {
-        1: '#fff',
-        2: '#000',
-        3: '#f00'
+    var s = new WebSocket('ws://localhost:8000');
+    var data = {'state':[
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+        'players':[
+            {
+                'name': 'Player 1',
+                'color': '#000'
+            },{
+                'name': 'Player 2',
+                'color': '#fff'
+            },{
+                'name': 'Player 3',
+                'color': '#f00'
+            }],
+        'turn': 0
     };
 
-    var put_stone = function(x, y, value){
+    var put_stone = function(x, y){
+        s.send(JSON.stringify([x, y]));
+    };
+
+    var draw_stone = function(x, y, value){
         var real_x = (x + 1) * square_length;
         var real_y = (y + 1) * square_length;
         var radius = square_length/2.2;
@@ -19,16 +42,19 @@
             case -1:
                 break;
             case 0:
-                color = '#fff';
+                color = data.players[data.turn].color;
                 stone.hover(function(){
                     stone.attr('opacity', 0.5);
                 }, function(){
                     stone.attr('opacity', 0);
                 });
+                stone.click(function(){
+                    put_stone(x, y);
+                });
                 stone.attr('opacity', 0);
                 break;
             default:
-                color = colors[value];
+                color = data.players[value - 1].color;
                 break;
         }
         stone.attr('fill', color);
@@ -39,7 +65,7 @@
         $('body').empty();
         var width = $(window).width();
         var height = $(window).height();
-        var grid = 9;
+        var grid = data.state.length;
 
         paper = Raphael(0, 0, width, height);
 
@@ -56,9 +82,9 @@
             }
         }
         rect.attr('fill', '#ccc');
-        for (i = 0; i < grid; i++){
-            for (j = 0; j < grid; j++){
-                put_stone(i, j, 0);
+        for (i = 0; i < data.state.length; i++){
+            for (j = 0; j < data.state[i].length; j++){
+                draw_stone(i, j, data.state[i][j]);
             }
         }
 
@@ -67,12 +93,12 @@
         draw();
     });
     draw();
-    put_stone(0, 0, 1);
-    put_stone(1, 1, 1);
+    draw_stone(0, 0, 1);
+    draw_stone(1, 1, 1);
 
-    put_stone(0, 1, 2);
-    put_stone(6, 2, 2);
+    draw_stone(0, 1, 2);
+    draw_stone(6, 2, 2);
 
-    put_stone(5, 6, 3);
-    put_stone(7, 5, 3);
+    draw_stone(5, 6, 3);
+    draw_stone(7, 5, 3);
 })();
