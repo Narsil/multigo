@@ -52,10 +52,8 @@ app.listen(3000, function () {
  */
 
 var io = sio.listen(app)
-  , nicknames = {};
-
-io.sockets.on('connection', function (socket) {
-  var data = {'state':[
+  , nicknames = {}
+  , data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -65,20 +63,14 @@ io.sockets.on('connection', function (socket) {
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0]],
-        'players':[
-            {
-                'name': 'Player 1',
-                'color': '#000'
-            },{
-                'name': 'Player 2',
-                'color': '#fff'
-            },{
-                'name': 'Player 3',
-                'color': '#f00'
-            }],
+        'players':[],
         'turn': 0
-    };
+    };;
 
+io.sockets.on('connection', function (socket) { 
+// Player 1 color : '#000'
+// Player 1 color : '#fff'
+// Player 1 color : '#f00'
   socket.on('user message', function (msg) {
     socket.broadcast.emit('user message', socket.nickname, msg);
   });
@@ -91,6 +83,26 @@ io.sockets.on('connection', function (socket) {
       nicknames[nick] = socket.nickname = nick;
       socket.broadcast.emit('announcement', nick + ' connected');
       io.sockets.emit('nicknames', nicknames);
+      switch(data.players.length){
+      case 0:
+          data.players.push({
+            'name': nick,
+            'color': '#000'
+          });
+        break;
+      case 1:
+        data.players.push({
+            'name': nick,
+            'color': '#fff'
+          });
+        break;
+      case 2:
+        data.players.push({
+            'name': nick,
+            'color': '#f00'
+          });
+        break;
+    }
     }
   });
 
@@ -98,8 +110,8 @@ io.sockets.on('connection', function (socket) {
     var x = msg[0];
     var y = msg[1];
 
-    data['state'][x][y] = data["turn"]+1;
-    data["turn"] = (data["turn"]+1)%data["players"].length;
+    data.state[x][y] = data.turn +1;
+    data.turn = (data.turn+1)%data.players.length;
     socket.broadcast.emit('data',data);
   });
 
@@ -107,6 +119,17 @@ io.sockets.on('connection', function (socket) {
     if (!socket.nickname) return;
 
     delete nicknames[socket.nickname];
+    var i = 0;
+    while(true){
+      if(i<data.players.length){
+        if (data.players[i].name === socket.nickname){
+          delete data.players[i];
+          break;
+        }
+      }else{
+        break;
+      }
+    }
     socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
     socket.broadcast.emit('nicknames', nicknames);
   });
