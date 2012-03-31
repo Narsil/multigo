@@ -112,6 +112,12 @@ io.sockets.on('connection', function (socket) {
 
     data.state[x][y] = data.turn +1;
     data.turn = (data.turn+1)%data.players.length;
+
+    if (x === undefined || y === undefined){
+        return;
+    }
+
+    console.log(data.players[data.turn] + 'a joué en ' + x +', ' + y);
     socket.broadcast.emit('data',data);
   });
 

@@ -28,7 +28,8 @@
     var player = 0;
 
     socket.on('data', function(msg){
-        data = $.parseJSON(msg);
+        data = msg;
+        draw();
     });
 
     var put_stone = function(x, y){
@@ -91,7 +92,7 @@
                 paper.rect(i * square_length, j * square_length, square_length, square_length);
             }
         }
-        rect.attr('fill', '#ccc');
+        rect.attr('fill', '#e8bf84');
         for (i = 0; i < data.state.length; i++){
             for (j = 0; j < data.state[i].length; j++){
                 draw_stone(i, j, data.state[i][j]);
