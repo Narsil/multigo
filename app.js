@@ -117,8 +117,8 @@ io.sockets.on('connection', function (socket) {
     var x = msg[0];
     var y = msg[1];
 
-    data.state[x][y] = data.turn +1;
     data.turn = (data.turn+1)%data.players.length;
+    data.state[x][y] = data.turn;
 
     if (x === undefined || y === undefined){
         return;
