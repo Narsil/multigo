@@ -1,4 +1,5 @@
 var http = require("http");
+var CONFIG = require("./config.js");
 
 function start() {
   function onRequest(request, response) {
@@ -8,11 +9,11 @@ function start() {
     response.end();
   }
 
-  http.createServer(onRequest).listen(8080);
+  http.createServer(onRequest).listen(CONFIG.PORT);
   console.log("Server has started.");
 }
 
-console.log("Listening on http://127.0.0.1:8080");
+console.log("Listening on http://"+CONFIG.URL+":"+CONFIG.PORT);
 
 exports.start = start;
 
