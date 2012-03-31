@@ -6,6 +6,8 @@ var express = require('express');
 var stylus = require('stylus');
 var nib = require('nib');
 var sio = require('socket.io');
+var go = require('./go.js');
+
 
 /**
  * App.
@@ -124,19 +126,16 @@ io.sockets.on('connection', function (socket) {
     if(msg !== null){
       var x = msg[0];
       var y = msg[1];
-      data.turn = (data.turn+1)%data.players.length;
-      data.state[x][y] = data.turn;
 
-      if (x === undefined || y === undefined){
-          return;
-      }
+      data.state = go.update_board(data.state, x, y, data.turn + 1);
 
       io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
     }else{
       io.sockets.emit('announcement', data.players[data.turn].name + 'a passé son tour');
-      data.turn = (data.turn+1)%data.players.length;
     }
-    
+
+    data.turn = (data.turn+1)%data.players.length;
+
     io.sockets.emit('data',data);
   });
 
