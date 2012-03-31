@@ -106,6 +106,7 @@ io.sockets.on('connection', function (socket) {
     data.turn = (data.turn+1) % data.players.length;
     console.log(data.players[data.turn] + 'a joué en ' + x +', ' + y);
     io.sockets.emit('data',data);
+    socket.broadcast.emit('data',data);
   });
 
   socket.on('disconnect', function () {
