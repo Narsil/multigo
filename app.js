@@ -83,24 +83,31 @@ io.sockets.on('connection', function (socket) {
       nicknames[nick] = socket.nickname = nick;
       socket.broadcast.emit('announcement', nick + ' connected');
       io.sockets.emit('nicknames', nicknames);
+
       switch(data.players.length){
       case 0:
           data.players.push({
             'name': nick,
             'color': '#000'
           });
+          io.sockets.emit('position', 0);
         break;
       case 1:
         data.players.push({
             'name': nick,
             'color': '#fff'
           });
+        io.sockets.emit('position', 1);
         break;
       case 2:
         data.players.push({
             'name': nick,
             'color': '#f00'
           });
+        io.sockets.emit('position', 2);
+        break;
+      default:
+        io.sockets.emit('position', -1);
         break;
     }
     }
