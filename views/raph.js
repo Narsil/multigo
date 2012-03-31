@@ -1,7 +1,7 @@
 (function(){
     var paper;
     var square_length;
-    var s = new WebSocket('ws://localhost:8000');
+    var s = io.connect('http://localhost/');
     var data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,9 +27,9 @@
     };
     var player = 0;
 
-    s.onmessage = function(msg){
+    s.on('data', function(msg){
         data = $.parseJSON(msg);
-    };
+    });
 
     var put_stone = function(x, y){
         s.send(JSON.stringify([x, y]));
