@@ -2,10 +2,10 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , stylus = require('stylus')
-  , nib = require('nib')
-  , sio = require('socket.io');
+var express = require('express');
+var stylus = require('stylus');
+var nib = require('nib');
+var sio = require('socket.io');
 
 /**
  * App.
@@ -18,16 +18,16 @@ var app = express.createServer();
  */
 
 app.configure(function () {
+  function compile (str, path) {
+    return stylus(str)
+      .set('filename', path)
+      .use(nib());
+  }
   app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
   app.use(express.static(__dirname + '/public'));
   app.set('views', __dirname);
   app.set('view engine', 'jade');
 
-  function compile (str, path) {
-    return stylus(str)
-      .set('filename', path)
-      .use(nib());
-  };
 });
 
 /**
@@ -51,9 +51,9 @@ app.listen(3000, function () {
  * Socket.IO server (single process only)
  */
 
-var io = sio.listen(app)
-  , nicknames = {}
-  , data = {'state':[
+var io = sio.listen(app);
+var nicknames = {};
+var data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -65,7 +65,7 @@ var io = sio.listen(app)
         [0, 0, 0, 0, 0, 0, 0, 0, 0]],
         'players':[],
         'turn': 0
-    };;
+    };
 
 io.sockets.on('connection', function (socket) { 
 // Player 1 color : '#000'
@@ -85,33 +85,34 @@ io.sockets.on('connection', function (socket) {
       io.sockets.emit('nicknames', nicknames);
 
       switch(data.players.length){
-      case 0:
-          data.players.push({
-            'name': nick,
-            'color': '#000'
-          });
-          io.sockets.emit('position', 0);
-        break;
-      case 1:
-        data.players.push({
-            'name': nick,
-            'color': '#fff'
-          });
-        io.sockets.emit('position', 1);
-        break;
-      case 2:
-        data.players.push({
-            'name': nick,
-            'color': '#f00'
-          });
-        io.sockets.emit('position', 2);
-        break;
-      default:
-        io.sockets.emit('position', -1);
-        break;
+        case 0:
+            data.players.push({
+                'name': nick,
+                'color': '#000'
+            });
+            io.sockets.emit('position', 0);
+            break;
+        case 1:
+            data.players.push({
+                'name': nick,
+                'color': '#fff'
+            });
+            io.sockets.emit('position', 1);
+            break;
+        case 2:
+            data.players.push({
+                'name': nick,
+                'color': '#f00'
+            });
+            io.sockets.emit('position', 2);
+            break;
+        default:
+            io.sockets.emit('position', -1);
+            break;
+      }
+      io.sockets.emit('data', data);
     }
-    }
-  });
+});
 
   socket.on('play', function(msg){
     var x = msg[0];
@@ -125,17 +126,19 @@ io.sockets.on('connection', function (socket) {
     }
 
     socket.broadcast.emit('announcement', data.players[data.turn] + 'a joué en ' + x +', ' + y);
-    socket.broadcast.emit('data',data);
+    io.sockets.emit('data',data);
   });
 
   socket.on('disconnect', function () {
-    if (!socket.nickname) return;
+    if (!socket.nickname){
+        return;
+    }
 
     delete nicknames[socket.nickname];
     var i = 0;
     while(true){
       if(i<data.players.length){
-        if (data.players[i].name === socket.nickname){
+        if (data.players[i] && data.players[i].name === socket.nickname){
           delete data.players[i];
           break;
         }
