@@ -1,7 +1,7 @@
 (function(){
     var paper;
     var square_length;
-    var socket = io.connect('http://localhost/');
+    var socket = io.connect();
     var data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,15 +27,12 @@
     };
     var player = 0;
 
-    socket.on('connect', function(){
-        $('#chat').addClass('connect');
-    });
     socket.on('data', function(msg){
         data = $.parseJSON(msg);
     });
 
     var put_stone = function(x, y){
-        socket.send(JSON.stringify([x, y]));
+        socket.emit('play', [x, y]);
     };
 
     var draw_stone = function(x, y, value){
