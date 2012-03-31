@@ -109,7 +109,8 @@ io.sockets.on('connection', function (socket) {
       default:
         socket.emit('position', -1);
         break;
-    }
+      }
+      socket.emit('data',data);
     }
 });
 

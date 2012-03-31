@@ -69,7 +69,9 @@
                 }
                 break;
             default:
-                color = data.players[value - 1].color;
+                if (data.players[value - 1]){
+                    color = data.players[value - 1].color;
+                }
                 break;
         }
         stone.attr('fill', color);
@@ -111,7 +113,11 @@
                     draw_stone(i, j, data.state[i][j]);
                 }
             }
+            paper.text(100, 10, data.players[data.turn].name + ' joue');
+        }else{
+            paper.text(100, 10,' Je ne sais que dessiner');
         }
+
 
     };
     $(window).resize(function(){
