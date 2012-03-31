@@ -100,7 +100,7 @@ io.sockets.on('connection', function (socket) {
 
     data['state'][x][y] = data["turn"]+1;
     data["turn"] = (data["turn"]+1)%data["players"].length;
-    io.sockets.emit('data',data);
+    socket.broadcast.emit('data',data);
   });
 
   socket.on('disconnect', function () {
