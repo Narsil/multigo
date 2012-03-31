@@ -98,8 +98,13 @@ io.sockets.on('connection', function (socket) {
     var x = msg[0];
     var y = msg[1];
 
-    data['state'][x][y] = data["turn"]+1;
-    data["turn"] = (data["turn"]+1)%data["players"].length;
+    if (x === undefined || y === undefined){
+        return;
+    }
+
+    data.state[x][y] = data.turn+1;
+    data.turn = (data.turn+1) % data.players.length;
+    console.log(data.players[data.turn] + 'a joué en ' + x +', ' + y);
     io.sockets.emit('data',data);
   });
 
