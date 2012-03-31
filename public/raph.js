@@ -1,7 +1,7 @@
 (function(){
     var paper;
     var square_length;
-    var s = io.connect('http://localhost/');
+    var socket = io.connect('http://localhost/');
     var data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,12 +27,15 @@
     };
     var player = 0;
 
-    s.on('data', function(msg){
+    socket.on('connect', function(){
+        $('#chat').addClass('connect');
+    });
+    socket.on('data', function(msg){
         data = $.parseJSON(msg);
     });
 
     var put_stone = function(x, y){
-        s.send(JSON.stringify([x, y]));
+        socket.send(JSON.stringify([x, y]));
     };
 
     var draw_stone = function(x, y, value){
@@ -69,12 +72,15 @@
     };
 
     var draw = function(){
-        $('body').empty();
+        $('body svg').remove();
         var width = $(window).width();
         var height = $(window).height();
         var grid = data.state.length;
 
-        paper = Raphael(0, 0, width, height);
+        var min = Math.min(width, height);
+
+        paper = Raphael(0, 0, min, min);
+
 
         var rect = paper.rect(0, 0, width, height);
 

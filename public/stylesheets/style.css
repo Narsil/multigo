@@ -1,22 +1,23 @@
-#chat,
 #nickname,
 #messages {
-  width: 600px;
+  width: 100%;
 }
 #chat {
+  width:40%;
+  float:right;
   position: relative;
   border: 1px solid #ccc;
 }
 #nickname,
 #connecting {
   position: absolute;
-  height: 410px;
+  height: 80%;
   z-index: 100;
   left: 0;
   top: 0;
   background: #fff;
   text-align: center;
-  width: 600px;
+  width: 100%;
   font: 15px Georgia;
   color: #666;
   display: block;
@@ -85,7 +86,6 @@
   text-shadow: 0 1px 0 #666;
 }
 #messages #lines {
-  height: 355px;
   overflow: auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -126,7 +126,7 @@
   padding: 0 10px;
   line-height: 30px;
   vertical-align: middle;
-  width: 580px;
+  width: 300%;
 }
 #send-message input:focus {
   outline: 0;
