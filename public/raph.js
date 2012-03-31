@@ -2,30 +2,32 @@
     var paper;
     var square_length;
     var socket = io.connect();
-    var data = {'state':[
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]],
-        'players':[
-            {
-                'name': 'Player 1',
-                'color': '#000'
-            },{
-                'name': 'Player 2',
-                'color': '#fff'
-            },{
-                'name': 'Player 3',
-                'color': '#f00'
-            }],
-        'turn': 0
-    };
-    var player = 0;
+    var data;
+    // = 
+    // {'state':[
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //     [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+    //     'players':[
+    //         {
+    //             'name': 'Player 1',
+    //             'color': '#000'
+    //         },{
+    //             'name': 'Player 2',
+    //             'color': '#fff'
+    //         },{
+    //             'name': 'Player 3',
+    //             'color': '#f00'
+    //         }],
+    //     'turn': 0
+    // };
+    var player;// = 0;
 
     socket.on('data', function(msg){
         data = msg;
@@ -34,6 +36,7 @@
 
     socket.on('position', function(pos){
         player = pos;
+        draw();
     });
 
     var put_stone = function(x, y){
@@ -52,7 +55,7 @@
             case -1:
                 break;
             case 0:
-                if(data.turn == player){
+                if(player !== undefined && data.turn == player){
                     color = data.players[data.turn].color;
                     stone.hover(function(){
                         stone.attr('opacity', 0.5);
@@ -77,7 +80,12 @@
         $('body svg').remove();
         var width = $(window).width();
         var height = $(window).height();
-        var grid = data.state.length;
+        var grid;
+        if (data !== undefined){
+            grid = data.state.length;
+        }else{
+            grid=9;
+        }
 
         var min = Math.min(width, height);
 
@@ -97,9 +105,11 @@
             }
         }
         rect.attr('fill', '#e8bf84');
-        for (i = 0; i < data.state.length; i++){
-            for (j = 0; j < data.state[i].length; j++){
-                draw_stone(i, j, data.state[i][j]);
+        if (data !== undefined){
+            for (i = 0; i < data.state.length; i++){
+                for (j = 0; j < data.state[i].length; j++){
+                    draw_stone(i, j, data.state[i][j]);
+                }
             }
         }
 
