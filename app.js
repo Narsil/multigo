@@ -55,6 +55,30 @@ var io = sio.listen(app)
   , nicknames = {};
 
 io.sockets.on('connection', function (socket) {
+  var data = {'state':[
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+        'players':[
+            {
+                'name': 'Player 1',
+                'color': '#000'
+            },{
+                'name': 'Player 2',
+                'color': '#fff'
+            },{
+                'name': 'Player 3',
+                'color': '#f00'
+            }],
+        'turn': 0
+    };
+
   socket.on('user message', function (msg) {
     socket.broadcast.emit('user message', socket.nickname, msg);
   });
@@ -68,6 +92,14 @@ io.sockets.on('connection', function (socket) {
       socket.broadcast.emit('announcement', nick + ' connected');
       io.sockets.emit('nicknames', nicknames);
     }
+  });
+
+  socket.on('play', function(msg){
+    var x = msg['x'];
+    var y = msg['y'];
+
+    data['state'][x][y] = msg["turn"];
+    io.sockets.emit('data',data);
   });
 
   socket.on('disconnect', function () {
