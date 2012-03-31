@@ -34,7 +34,7 @@
 
     socket.on('position', function(pos){
         player = pos;
-    })
+    });
 
     var put_stone = function(x, y){
         socket.emit('play', [x, y]);
