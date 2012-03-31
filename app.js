@@ -53,6 +53,7 @@ app.listen(3000, function () {
 
 var io = sio.listen(app);
 var nicknames = {};
+var back = {};
 var data = {'state':[
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -66,6 +67,7 @@ var data = {'state':[
         'players':[],
         'turn': 0
     };
+var pollCount = 0;
 
 io.sockets.on('connection', function (socket) { 
 // Player 1 color : '#000'
@@ -86,13 +88,15 @@ io.sockets.on('connection', function (socket) {
 
       switch(data.players.length){
       case 0:
-          data.players.push({
-            'name': nick,
-            'color': '#000'
-          });
-          socket.emit('position', 0);
+        back = data;
+        data.players.push({
+          'name': nick,
+          'color': '#000'
+        });
+        socket.emit('position', 0);
         break;
       case 1:
+        back = data;
         data.players.push({
             'name': nick,
             'color': '#fff'
@@ -100,6 +104,7 @@ io.sockets.on('connection', function (socket) {
         socket.emit('position', 1);
         break;
       case 2:
+        back = data;
         data.players.push({
             'name': nick,
             'color': '#f00'
@@ -115,11 +120,12 @@ io.sockets.on('connection', function (socket) {
 });
 
   socket.on('play', function(msg){
+    back = data;
     if(msg !== null){
       var x = msg[0];
       var y = msg[1];
-
-      data.state[x][y] = data.turn + 1;
+      data.turn = (data.turn+1)%data.players.length;
+      data.state[x][y] = data.turn;
 
       if (x === undefined || y === undefined){
           return;
@@ -127,24 +133,58 @@ io.sockets.on('connection', function (socket) {
 
       io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
     }else{
-      io.sockets.emit('announcement', data.players[data.turn].name + 'a passé sontour');
+      io.sockets.emit('announcement', data.players[data.turn].name + 'a passé son tour');
+      data.turn = (data.turn+1)%data.players.length;
     }
-    data.turn = (data.turn+1)%data.players.length;
+    
     io.sockets.emit('data',data);
   });
 
-  socket.on('restart',function(){
-    data.state =[
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]];
-    data.turn = 0;
+  socket.on('poll',function(msg){
+    if(msg.type === "request"){
+      pollCount = 0;
+      socket.broadcast.emit('poll',{
+        'type': 'request',
+        'name': msg.name
+      });
+
+    }else if (msg.type === "answer"){
+      if(msg.value === 1){
+        pollCount++;
+        if(pollCount === data.players.length){
+          if(msg.name === "restart"){
+            data.state =[
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0]];
+            data.turn = 0;
+            back = data;
+          }else if(msg.name === "back"){
+            data = back;
+          }
+          io.sockets.emit('poll',{
+          'type':'answer',
+          'name': msg.name,
+          'value': 1,
+          'data': data
+        });
+        }
+      }else{
+        //Request not allowed
+        io.sockets.emit('poll',{
+          'type':'answer',
+          'name': msg.name,
+          'value': 0
+        });
+      }
+
+    }
 
   })
 
@@ -159,6 +199,7 @@ io.sockets.on('connection', function (socket) {
       if(i<data.players.length){
         if (data.players[i] && data.players[i].name === socket.nickname){
           delete data.players[i];
+          delete back.players[i];
           break;
         }
       }else{
