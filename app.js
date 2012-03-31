@@ -115,19 +115,38 @@ io.sockets.on('connection', function (socket) {
 });
 
   socket.on('play', function(msg){
-    var x = msg[0];
-    var y = msg[1];
+    if(msg !== null){
+      var x = msg[0];
+      var y = msg[1];
 
-    data.state[x][y] = data.turn + 1;
+      data.state[x][y] = data.turn + 1;
 
-    if (x === undefined || y === undefined){
-        return;
+      if (x === undefined || y === undefined){
+          return;
+      }
+
+      io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
+    }else{
+      io.sockets.emit('announcement', data.players[data.turn].name + 'a passé sontour');
     }
-
-    io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
     data.turn = (data.turn+1)%data.players.length;
     io.sockets.emit('data',data);
   });
+
+  socket.on('restart',function(){
+    data.state =[
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]];
+    data.turn = 0;
+
+  })
 
   socket.on('disconnect', function () {
     if (!socket.nickname){
