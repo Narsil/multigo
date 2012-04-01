@@ -7,6 +7,8 @@ var stylus = require('stylus');
 var nib = require('nib');
 var sio = require('socket.io');
 var go = require('./go.js');
+var URL = require('./config.js').URL;
+var PORT = require('./config.js').PORT;
 
 
 /**
@@ -44,9 +46,9 @@ app.get('/', function (req, res) {
  * App listen.
  */
 
-app.listen(3000, function () {
+app.listen(PORT, function () {
   var addr = app.address();
-  console.log('   app listening on http://' + addr.address + ':' + addr.port);
+  console.log('   app listening on ' + URL + ':' + PORT);
 });
 
 /**
