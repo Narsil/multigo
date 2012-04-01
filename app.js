@@ -127,7 +127,7 @@ io.sockets.on('connection', function (socket) {
       var x = msg[0];
       var y = msg[1];
 
-      data.state = go.update_board(data.state, x, y, data.turn + 1);
+      data.state = go.update_state(data.state, x, y, data.turn + 1);
 
       io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
     }else{
