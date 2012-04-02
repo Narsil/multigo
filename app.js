@@ -72,6 +72,16 @@ var data = {'state':[
         'turn': 0
     };
 var pollCount = 0;
+var colors = [
+    '#000',
+    '#fff',
+    '#f00',
+    '#0f0',
+    '#00f',
+    '#ff0',
+    '#f0f',
+    '#0ff'
+];
 
 io.sockets.on('connection', function (socket) { 
 // Player 1 color : '#000'
@@ -90,37 +100,15 @@ io.sockets.on('connection', function (socket) {
       socket.broadcast.emit('announcement', nick + ' connected');
       io.sockets.emit('nicknames', nicknames);
 
-      switch(data.players.length){
-      case 0:
-        back = data;
-        data.players.push({
-          'name': nick,
-          'color': '#000'
-        });
-        socket.emit('position', 0);
-        break;
-      case 1:
-        back = data;
-        data.players.push({
-            'name': nick,
-            'color': '#fff'
-          });
-        socket.emit('position', 1);
-        break;
-      case 2:
-        back = data;
-        data.players.push({
-            'name': nick,
-            'color': '#f00'
-          });
-        socket.emit('position', 2);
-        break;
-      default:
-        socket.emit('position', -1);
-        break;
-      }
-      socket.emit('data',data);
-    }
+    back = data;
+    var position = data.players.length;
+    data.players.push({
+        'name': nick,
+        'color': colors[position % colors.length]
+    });
+    socket.emit('position', position);
+    socket.emit('data',data);
+  }
 });
 
   socket.on('play', function(msg){
@@ -128,15 +116,21 @@ io.sockets.on('connection', function (socket) {
     if(msg !== null){
       var x = msg[0];
       var y = msg[1];
-
       data.state = go.update_state(data.state, x, y, data.turn + 1);
 
-      io.sockets.emit('announcement', data.players[data.turn].name + 'a joué en ' + x +', ' + y);
+      io.sockets.emit('announcement', data.players[data.turn].name + ' a joué en ' + x +', ' + y);
     }else{
-      io.sockets.emit('announcement', data.players[data.turn].name + 'a passé son tour');
+      io.sockets.emit('announcement', data.players[data.turn].name + ' a passé son tour');
     }
 
-    data.turn = (data.turn+1)%data.players.length;
+    // In case we only have 1 player do not authorize him to put infinite stones.
+    var to_play = (data.turn+1)%data.players.length;
+    if (to_play == data.turn){
+        to_play = data.turn + 1;
+        io.socket.emit("En attente d'un autre joueur, vous pouvez ouvrir un nouvel onglet pour simuler ce nouveau joueur");
+    }
+
+    data.turn = to_play;
 
     io.sockets.emit('data',data);
   });
@@ -187,7 +181,7 @@ io.sockets.on('connection', function (socket) {
 
     }
 
-  })
+  });
 
   socket.on('disconnect', function () {
     if (!socket.nickname){
