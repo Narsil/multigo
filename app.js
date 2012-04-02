@@ -127,7 +127,7 @@ io.sockets.on('connection', function (socket) {
     var to_play = (data.turn+1)%data.players.length;
     if (to_play == data.turn){
         to_play = data.turn + 1;
-        io.socket.emit("En attente d'un autre joueur, vous pouvez ouvrir un nouvel onglet pour simuler ce nouveau joueur");
+        socket.emit('announcement', "En attente d'un autre joueur, vous pouvez ouvrir un nouvel onglet pour simuler ce nouveau joueur");
     }
 
     data.turn = to_play;
