@@ -6,9 +6,9 @@ var express = require('express');
 var stylus = require('stylus');
 var nib = require('nib');
 var sio = require('socket.io');
-var go = require('./go.js');
-var URL = require('./config.js').URL;
-var PORT = require('./config.js').PORT;
+var go = require('./controllers/go.js');
+var URL = require('./controllers/config.js').URL;
+var PORT = require('./controllers/config.js').PORT;
 
 
 /**
@@ -39,7 +39,7 @@ app.configure(function () {
  */
 
 app.get('/', function (req, res) {
-  res.render('index', { layout: false });
+  res.render('views/index', { layout: false });
 });
 
 /**
