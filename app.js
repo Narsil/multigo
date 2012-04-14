@@ -71,7 +71,7 @@ var data = {'state':[
         'players':[],
         'turn': 0
     };
-var pollCount = 0;
+var polls = [];
 var colors = [
     '#000',
     '#fff',
@@ -118,16 +118,16 @@ io.sockets.on('connection', function (socket) {
       var y = msg[1];
       data.state = go.update_state(data.state, x, y, data.turn + 1);
 
-      io.sockets.emit('announcement', data.players[data.turn].name + ' a joué en ' + x +', ' + y);
+      io.sockets.emit('announcement', data.players[data.turn].name + ' played at ' + x +', ' + y);
     }else{
-      io.sockets.emit('announcement', data.players[data.turn].name + ' a passé son tour');
+      io.sockets.emit('announcement', data.players[data.turn].name + ' passed');
     }
 
     // In case we only have 1 player do not authorize him to put infinite stones.
     var to_play = (data.turn+1)%data.players.length;
     if (to_play == data.turn){
         to_play = data.turn + 1;
-        socket.emit('announcement', "En attente d'un autre joueur, vous pouvez ouvrir un nouvel onglet pour simuler ce nouveau joueur");
+        socket.emit('announcement', "Waiting for other players. You can connect from other tabs to simulate other players.");
     }
 
     data.turn = to_play;
@@ -181,6 +181,20 @@ io.sockets.on('connection', function (socket) {
 
     }
 
+  });
+
+  socket.on('call_poll', function(msg){
+      msg.id = polls.length;
+      polls.push(msg);
+      io.sockets.emit('announcement', data.players[msg.pollees[0].player].name + ' wants to ' + msg.type);
+      io.sockets.emit('call_poll', msg);
+      console.log(msg);
+  });
+
+  socket.on('poll', function(msg){
+      var poll = polls[msg.id];
+      poll.pollees.push(msg);
+      io.sockets.emit('poll', poll);
   });
 
   socket.on('disconnect', function () {
