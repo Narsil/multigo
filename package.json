@@ -1,7 +1,11 @@
 {
-    "name": "chat.io"
-  , "description": "example chat application with socket.io"
+    "name": "mutigo"
+  , "description": "A multiplayer go app"
   , "version": "0.0.1"
+  , "engines": {
+        "node": "0.6.15"
+      , "npm": "1.0.106"
+  }
   , "dependencies": {
         "express": "2.5.5"
       , "jade": "0.16.4"
