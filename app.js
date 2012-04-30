@@ -54,6 +54,11 @@ app.listen(process.env.PORT || app.set('PORT'), function () {
  */
 
 var io = sio.listen(app);
+io.configure(function(){
+    io.set('transports', ['xhr-polling']);
+    io.set('polling duration', 5);
+});
+
 var nicknames = {};
 var back = {};
 var data = {'state':[
