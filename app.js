@@ -31,9 +31,6 @@ app.configure(function () {
   app.set('view engine', 'jade');
   app.set('PORT', 3000);
 });
-app.configure('production', function(){
-    app.set('PORT', 80);
-});
 
 /**
  * App routes.
@@ -47,7 +44,7 @@ app.get('/', function (req, res) {
  * App listen.
  */
 
-app.listen(app.set('PORT'), function () {
+app.listen(process.env.PORT || app.set('PORT'), function () {
   var addr = app.address();
   console.log('   app listening on port ' + app.set('PORT'));
 });
