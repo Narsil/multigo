@@ -7,8 +7,6 @@ var stylus = require('stylus');
 var nib = require('nib');
 var sio = require('socket.io');
 var go = require('./controllers/go.js');
-var URL = require('./controllers/config.js').URL;
-var PORT = require('./controllers/config.js').PORT;
 
 
 /**
@@ -31,7 +29,10 @@ app.configure(function () {
   app.use(express.static(__dirname + '/public'));
   app.set('views', __dirname);
   app.set('view engine', 'jade');
-
+  app.set('PORT', 3000);
+});
+app.configure('production', function(){
+    app.set('PORT', 80);
 });
 
 /**
@@ -46,9 +47,9 @@ app.get('/', function (req, res) {
  * App listen.
  */
 
-app.listen(PORT, function () {
+app.listen(app.set('PORT'), function () {
   var addr = app.address();
-  console.log('   app listening on ' + URL + ':' + PORT);
+  console.log('   app listening on port ' + app.set('PORT'));
 });
 
 /**
